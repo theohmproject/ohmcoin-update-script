@@ -57,7 +57,7 @@ sleep 3 && \
 rm -rf /usr/local/bin/backup/ ../ohmc*.tar.gz && \
 echo -e "${red}Target destroyed${nc}" && \
 sleep 3 && \
-echo -e "${green}You may now start the Vitae daemon normally ie.${nc}" && \
+echo -e "${green}You may now start the Ohmcoin daemon normally ie.${nc}" && \
 sleep 3 && \
 echo " " && \
 echo  -e "${red}ohmcd -daemon -txindex${nc}" && \
