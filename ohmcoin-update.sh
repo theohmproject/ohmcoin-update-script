@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-#Copyright (c) 2018 The Ohmcoin developers
+set -e
+
+#Copyright (c) 2018 - 2020 The Ohmcoin developers
+#maintained and created by A. LaChasse rasalghul at ohmcoin.org
 
 #The MIT License (MIT)
 
@@ -21,7 +24,24 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #THE SOFTWARE.
 
+######### Pre 3.0 Coin Specific Vars will be removed #########
+PRE_DAEMON=ohmcoind
+PRE_CLI=ohmcoin-cli
+PRE_TX=ohmcoin-tx
+######### Pre 3.0 Coin Specific Vars will be removed #########
 
+### Coin Specific Vars ###
+COINNAME=Ohmcoin
+VERSION=
+BINARYURL=https://github.com/theohmproject/ohmcoin/releases/download
+
+### Binary names
+DAEMON=ohmcoind
+CLI=ohmcoin-cli
+TX=ohmcoin-tx
+#QT=ohmcoin-qt
+
+######### No need to touch anything below here unless you know what you are doing #########
 
 #Colors
 yellow='\033[1;31m'
@@ -29,40 +49,55 @@ green='\033[0;32m'
 red='\033[0;31m'
 nc='\033[0m'
 
-if [[ $EUID -ne 0 ]]; then
+if [[ $EUID -ne 0 ]] ; then
 echo -e "${red}Please run as root or use sudo${nc}" 2>&1
 exit 1
-else ohmc-cli stop && \
-echo "${yellow}Backing up old daemon incase of script bomb${nc}" && \
-sleep 30 && \
-mkdir /usr/local/bin/backup && \
-mv /usr/local/bin/ohmcd /usr/local/bin/backup/ && \
-mv /usr/local/bin/ohmc-cli /usr/local/bin/backup/ && \
-mv /usr/local/bin/ohmc-tx /usr/local/bin/backup/ && \
-echo -e "${yellow}Updating Vitae daemon files${nc}" && \
-sleep 3 && \
-mv ohmcd /usr/local/bin/ && \
-mv ohmc-cli /usr/local/bin/ && \
-mv ohmc-tx /usr/local/bin/ && \
-echo -e "${green}Ohmcoin files updated${nc}" && \
-sleep 3 && \
-echo -e "${yellow}Charging laser weapons${nc}" && \
-sleep 3 && \
-echo -e "${yellow}Acquiring target${nc}" && \
-sleep 3 && \
-echo -e "${yellow}Target Aquired preparing to destroy backup files${nc}" && \
-sleep 3 && \
-echo  -e "${yellow}Firing all lasers${nc}" && \
-sleep 3 && \
-rm -rf /usr/local/bin/backup/ ../ohmc*.tar.gz && \
-echo -e "${red}Target destroyed${nc}" && \
-sleep 3 && \
-echo -e "${green}You may now start the Vitae daemon normally ie.${nc}" && \
-sleep 3 && \
-echo " " && \
-echo  -e "${red}ohmcd -daemon -txindex${nc}" && \
-echo " " && \
-sleep 3 && \
-echo -e "${red}Please make sure to restart your karmanode in your controller wallet to complete the upgrade process${nc}"
+
+else $PRE_CLI stop
+
+echo "${yellow}Backing up old daemon incase of script bomb${nc}"
+sleep 30
+
+mkdir /usr/local/bin/backup
+mv /usr/local/bin/$PRE_DAEMON /usr/local/bin/backup/
+mv /usr/local/bin/$PRE_CLI /usr/local/bin/backup/
+mv /usr/local/bin/$PRE_TX /usr/local/bin/backup/
+
+echo -e "${yellow}Updating $COINNAME daemon files${nc}"
+sleep 3
+
+mv $DAEMON /usr/local/bin/
+mv $CLI /usr/local/bin/
+mv $TX /usr/local/bin/
+
+echo -e "${green}$COINNAME files updated${nc}"
+sleep 3
+
+echo -e "${yellow}Charging laser weapons${nc}"
+sleep 3
+
+echo -e "${yellow}Acquiring target${nc}"
+sleep 3
+
+echo -e "${yellow}Target Acquired... preparing to destroy backup files${nc}"
+sleep 3
+
+echo  -e "${yellow}Firing all lasers${nc}"
+sleep 3
+
+rm -rf /usr/local/bin/backup/ ../ohmc*.tar.gz
+
+echo -e "${red}Target destroyed${nc}"
+sleep 3
+
+echo -e "${green}You may now start the $COINNAME daemon normally ie.${nc}"
+sleep 3
+
+echo " "
+echo  -e "${red}$DAEMON -daemon ${nc}"
+echo " "
+sleep 3
+echo -e "${red}Please make sure to restart your $NODENAME in your controller wallet to complete the upgrade process${nc}"
+
 fi
 exit
