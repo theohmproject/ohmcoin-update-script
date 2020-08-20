@@ -29,8 +29,11 @@ set -e
 ######### Begin Todo #########
 ###
 ### Add alternate user home install location for config and snapshot install
+###    https://www.cyberciti.biz/faq/linux-list-users-command/
 ### Add questionnaire at beginning of script so installer/update can be an answer and walk away setup
 ### Compile option logic
+### Add OS/Hardware Detection for compile logic and os
+###    https://github.com/coto/server-easy-install/blob/master/lib/core.sh
 ### Detect if coin has already been installed and add logic for update
 ### Add Security install options such as fail2ban
 ### Add advanced ssh config options
@@ -50,6 +53,8 @@ set -e
 COINNAME=Ohmcoin
 VERSION=3.0.0
 NODENAME=karmanode
+
+### Binary Files ###
 BINARY_FILE=ohmcoin-3.0.0-x86_64-linux-gnu.tar.gz
 BINARY_URL=https://github.com/theohmproject/ohmcoin/releases/download/
 #SOURCE_RL=https://github.com/theohmproject/ohmcoin/archive/
