@@ -48,10 +48,12 @@ set -e
 
 ### Coin Specific Vars ###
 COINNAME=Ohmcoin
+VERSION=3.0.0
 NODENAME=karmanode
-VERSION=
-BINARYURL=https://github.com/theohmproject/ohmcoin/releases/download
-#SOURCEURL= For when compile logic is added
+BINARY_FILE=ohmcoin-3.0.0-x86_64-linux-gnu.tar.gz
+BINARY_URL=https://github.com/theohmproject/ohmcoin/releases/download/
+#SOURCE_RL=https://github.com/theohmproject/ohmcoin/archive/
+INSTALL_DIR= /usr/local/bin/
 
 ### Coin Config Dir ###
 CONF_DIR=~/.ohmc/
@@ -63,10 +65,12 @@ RPCPORT=52021
 DAEMON=ohmcoind
 CLI=ohmcoin-cli
 TX=ohmcoin-tx
+QT=ohmcoin-qt
 
 ### Snapshot/Boostrap
-SNAPURL=
-
+# needs trailing slash
+SNAP_URL=https://ohmcoin.org/downloads/
+SNAP_FILE=snapshot.tar.gz
 
 #Dependencies for compile option space separated
 #YUM_PACKAGE_NAME=""
@@ -105,7 +109,12 @@ if [[ $DOSETUP =~ "y" ]] ; then
   echo "/var/swap.img none swap sw 0 0" >> /etc/fstab
 fi
 
-  echo "Configuring IP - Please Wait......."
+echo "Downloading Binaries"
+
+  curl -O $BINARY_URL$COMP_FILE
+  tar xvzf -C $BINARY_FILE $INSTALL_DIR
+
+echo "Configuring IP - Please Wait......."
 
   declare -a NODE_IPS
   for ips in $(netstat -i | awk '!/Kernel|Iface|lo/ {print $1," "}')
@@ -157,11 +166,11 @@ echo "${yellow}Would you like to install the snapshot/bootstrap? [y/n]${nc}"
 read DOSETUPSNAP
 
 if [[ $DOSETUPSNAP =~ "y" ]] ; then
-curl -O $SNAPURL
-
+curl -O $SNAP_URL$SNAP_FILE
+tar xvzf -C $SNAP_FILE $CONF_DIR
 fi
 
-   echo "${yellow}You may start your  with the following command${nc}"
+   echo "${yellow}You may start your with the following command${nc}"
    echo ""
    echo "$DAEMON -daemon"
 
