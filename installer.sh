@@ -51,7 +51,7 @@
 
 
 ### Coin Specific Vars ###
-COINNAME=Ohmcoin
+COINNAME=ohmcoin
 VERSION=3.0.0
 NODENAME=karmanode
 
@@ -91,35 +91,67 @@ red='\033[0;31m'
 nc='\033[0m'
 
 
-### this script really should switch between users on later updates ###
+### this script really should switch between users on later updates but will still need sudo to run ###
 if [[ $EUID -ne 0 ]]; then
 echo -e "${red}Please run as root or use sudo${nc}"
 exit 1
 fi
 
 ### the following could be said in a better way to not be so confusing, but will probably be removed on later updates ###
-echo -e "${red}Warning this script assumes it will be running as the same user running this script and will install $(tr a-z A-Z <<< ${COINNAME:0:1})${COINNAME:1} for the executing user${nc}"
+echo -e "${red}Warning this script assumes it will be running as the same user running this script and will install the $(tr a-z A-Z <<< ${COINNAME:0:1})${COINNAME:1} config files for the executing user${nc}"
 sleep 3
 
-echo -e "${yellow}Is this a fresh server install? [y/n]${nc}"
-read DOSETUP
 
-if [[ $DOSETUP =~ "y" ]]; then
 
-  echo -e "${red}Creating Swap Space${nc}"
-  cd /var
-  touch swap.img
-  chmod 600 swap.img
-  dd if=/dev/zero of=/var/swap.img bs=1024k count=4000
-  mkswap /var/swap.img
-  swapon /var/swap.img
-  free
-  echo -e "/var/swap.img none swap sw 0 0" >> /etc/fstab
+
+
+# Availbale Options
+if [ ! "$#" -ge 1 ]; then
+    echo "Usage: $0 {size}"
+    echo "(Default path: /var/lib/swap)"
+    printf '%s\n' "$@"
+
+	echo "---------------------------------------"
+	echo "Available options:"
+	printf '%s\n' "$@"
+	echo "size - Size of swap ( Example - 1G,2G or 1024M)"
+	echo "path - Path to create a swapfile"
+    exit 1
 fi
+
+SWAP_SIZE=$1
+
+# Default swap file
+
+SWAP_FILE=/var/lib/swap
+if [ ! -z "$2" ]; then
+    SWAP_FILE="$2"
+fi
+
+
+# Checking if swap already exists in ./etc/fstab
+grep -q "swap" /etc/fstab
+if ! grep -q "swap" /etc/fstab; then
+	 fallocate -l "$SWAP_SIZE" "$SWAP_FILE"
+	 chmod 600 "$SWAP_FILE"
+	 mkswap "$SWAP_FILE"
+	 swapon "$SWAP_FILE"
+	echo "$SWAP_FILE   none    swap    sw    0   0" |  tee /etc/fstab -a
+else
+	echo 'swapfile found. No changes made.'
+fi
+
+echo '----------------------'
+echo 'Checking list of swap'
+echo '----------------------'
+swapon -s
+
 
 echo -e "Downloading Binaries"
 
   curl -O $BINARY_URL$COMP_FILE
+
+echo -e "Installing $(tr a-z A-Z <<< ${COINNAME:0:1})${COINNAME:1}"
   tar xvzf -C $BINARY_FILE $INSTALL_DIR
 
 echo -e "Configuring IP - Please Wait......."
@@ -174,18 +206,18 @@ echo -e "${yellow}Would you like to install the snapshot/bootstrap? [y/n]${nc}"
 read DOSETUPSNAP
 
 if [[ $DOSETUPSNAP =~ "y" ]] ; then
-curl -O $SNAP_URL$SNAP_FILE
-tar xvzf -C $SNAP_FILE $CONF_DIR
+  curl -O $SNAP_URL$SNAP_FILE
+  tar xvzf -C $SNAP_FILE $CONF_DIR
 fi
 
-   echo -e "${yellow}You may start your with the following command${nc}"
+   echo -e "${yellow}You may start your node with the following command${nc}"
    echo ""
    echo "$DAEMON -daemon"
 
 sleep 3
 
 echo " "
-echo -e "${red}P.S. I delete myself${nc}"
+echo -e "${red}P.S. I deleted myself${nc}"
 echo " "
 rm $0
 
