@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-set -e
 
 #Copyright (c) 2018 - 2020 The Ohmcoin developers
-#maintained and created by A. LaChasse rasalghul at ohmcoin.org
+#maintained and created by A. LaChasse rasalghul at ohmcoin dot org
 
 #The MIT License (MIT)
 
@@ -31,12 +30,14 @@ set -e
 ### Add alternate user home install location for config and snapshot install
 ###    https://www.cyberciti.biz/faq/linux-list-users-command/
 ### Add questionnaire at beginning of script so installer/update can be an answer and walk away setup
-### Compile option logic
+### Compile option
 ### Add OS/Hardware Detection for compile logic and os
 ###    https://github.com/coto/server-easy-install/blob/master/lib/core.sh
 ### Detect if coin has already been installed and add logic for update
 ### Add Security install options such as fail2ban
+### Add Firewall Rules
 ### Add advanced ssh config options
+### Add Testnet set up
 ###
 ######### For Future Updates #########
 ###
@@ -55,9 +56,9 @@ VERSION=3.0.0
 NODENAME=karmanode
 
 ### Binary Files ###
-BINARY_FILE=ohmcoin-3.0.0-x86_64-linux-gnu.tar.gz
+BINARY_FILE=$COINNAME-$VERSION-x86_64-linux-gnu.tar.gz
 BINARY_URL=https://github.com/theohmproject/ohmcoin/releases/download/
-#SOURCE_RL=https://github.com/theohmproject/ohmcoin/archive/
+#SOURCE_URL=https://github.com/theohmproject/ohmcoin/archive/
 INSTALL_DIR= /usr/local/bin/
 
 ### Coin Config Dir ###
@@ -92,18 +93,20 @@ nc='\033[0m'
 
 ### this script really should switch between users on later updates ###
 if [[ $EUID -ne 0 ]]; then
-echo "${red}Please run as root or use sudo${nc}" 2>&1
+echo -e "${red}Please run as root or use sudo${nc}"
 exit 1
+fi
 
 ### the following could be said in a better way to not be so confusing, but will probably be removed on later updates ###
-echo "${red}Warning this script assumes it will be running as the same user running this script and will install $COINAME for the executing user${nc}"
+echo -e "${red}Warning this script assumes it will be running as the same user running this script and will install $(tr a-z A-Z <<< ${COINNAME:0:1})${COINNAME:1} for the executing user${nc}"
+sleep 3
 
-echo "${yellow}Is this a fresh server install? [y/n]${nc}"
+echo -e "${yellow}Is this a fresh server install? [y/n]${nc}"
 read DOSETUP
 
-if [[ $DOSETUP =~ "y" ]] ; then
+if [[ $DOSETUP =~ "y" ]]; then
 
-  echo "${red}Creating Swap Space${nc}"
+  echo -e "${red}Creating Swap Space${nc}"
   cd /var
   touch swap.img
   chmod 600 swap.img
@@ -111,15 +114,15 @@ if [[ $DOSETUP =~ "y" ]] ; then
   mkswap /var/swap.img
   swapon /var/swap.img
   free
-  echo "/var/swap.img none swap sw 0 0" >> /etc/fstab
+  echo -e "/var/swap.img none swap sw 0 0" >> /etc/fstab
 fi
 
-echo "Downloading Binaries"
+echo -e "Downloading Binaries"
 
   curl -O $BINARY_URL$COMP_FILE
   tar xvzf -C $BINARY_FILE $INSTALL_DIR
 
-echo "Configuring IP - Please Wait......."
+echo -e "Configuring IP - Please Wait......."
 
   declare -a NODE_IPS
   for ips in $(netstat -i | awk '!/Kernel|Iface|lo/ {print $1," "}')
@@ -127,8 +130,8 @@ echo "Configuring IP - Please Wait......."
   NODE_IPS+=($(curl --interface $ips --connect-timeout 2 -s4 icanhazip.com))
   done
 
-  if [ ${#NODE_IPS[@]} -gt 1 ] ; then
-     echo "${yellow}Please enter number of ip you would like to use${nc}"
+  if [ ${#NODE_IPS[@]} -gt 1 ]; then
+     echo -e "${yellow}Please enter the number of which ip you would like to use${nc}"
      INDEX=0
      for ip in "${NODE_IPS[@]}"
      do
@@ -141,7 +144,7 @@ echo "Configuring IP - Please Wait......."
      IP=${NODE_IPS[0]}
   fi
 
-   echo "IP Done"
+   echo -e "IP Done"
    echo ""
 
    mkdir -p $CONF_DIR
@@ -157,7 +160,7 @@ echo "Configuring IP - Please Wait......."
    echo "port=$PORT" >> $CONF_DIR/$CONF_FILE
    echo "$NODENAMEaddr=$IP:$PORT" >> $CONF_DIR/$CONF_FILE
 
-echo "${yellow}Is this a karmanode install? [y/n]${nc}"
+echo -e "${yellow}Is this a $NODENAME install? [y/n]${nc}"
 read DOSETUPKN
 
 if [[ $DOSETUPKN =~ "y" ]] ; then
@@ -167,7 +170,7 @@ if [[ $DOSETUPKN =~ "y" ]] ; then
  fi
 
 
-echo "${yellow}Would you like to install the snapshot/bootstrap? [y/n]${nc}"
+echo -e "${yellow}Would you like to install the snapshot/bootstrap? [y/n]${nc}"
 read DOSETUPSNAP
 
 if [[ $DOSETUPSNAP =~ "y" ]] ; then
@@ -175,11 +178,16 @@ curl -O $SNAP_URL$SNAP_FILE
 tar xvzf -C $SNAP_FILE $CONF_DIR
 fi
 
-   echo "${yellow}You may start your with the following command${nc}"
+   echo -e "${yellow}You may start your with the following command${nc}"
    echo ""
    echo "$DAEMON -daemon"
 
-exit 0
+sleep 3
+
+echo " "
+echo -e "${red}P.S. I delete myself${nc}"
+echo " "
+rm $0
 
 
 

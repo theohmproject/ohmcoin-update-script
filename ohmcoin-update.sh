@@ -2,7 +2,7 @@
 set -e
 
 #Copyright (c) 2018 - 2020 The Ohmcoin developers
-#maintained and created by A. LaChasse rasalghul at ohmcoin.org
+#maintained and created by A. LaChasse rasalghul at ohmcoin dot org
 
 #The MIT License (MIT)
 
@@ -24,16 +24,22 @@ set -e
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #THE SOFTWARE.
 
-######### Pre 3.0 Coin Specific Vars will be removed #########
+######### Pre 3.0 Coin Specific Vars (will be removed) #########
 PRE_DAEMON=ohmcoind
 PRE_CLI=ohmcoin-cli
 PRE_TX=ohmcoin-tx
-######### Pre 3.0 Coin Specific Vars will be removed #########
+######### Pre 3.0 Coin Specific Vars (will be removed) #########
 
 ### Coin Specific Vars ###
-COINNAME=Ohmcoin
-VERSION=
-BINARYURL=https://github.com/theohmproject/ohmcoin/releases/download
+COINNAME=ohmcoin
+VERSION=3.0.0
+NODENAME=Karmanode
+
+### Binary Files ###
+BINARY_FILE=$COINNAME-$VERSION-x86_64-linux-gnu.tar.gz
+BINARY_URL=https://github.com/theohmproject/ohmcoin/releases/download/
+#SOURCE_URL=https://github.com/theohmproject/ohmcoin/archive/
+INSTALL_DIR=/usr/local/bin/
 
 ### Binary names
 DAEMON=ohmcoind
@@ -52,25 +58,42 @@ nc='\033[0m'
 if [[ $EUID -ne 0 ]] ; then
 echo -e "${red}Please run as root or use sudo${nc}" 2>&1
 exit 1
+fi
 
-else $PRE_CLI stop
+### Check for older version ###
+if ! [ -x "$(command -v $PRE_DAEMON)" ]; then
+  echo -e "Pre $COINAME $VERSION is installed."
+  $PRE_CLI stop
+  echo -e "${yellow}Backing up old daemon incase of script bomb${nc}"
+  sleep 30
 
-echo "${yellow}Backing up old daemon incase of script bomb${nc}"
-sleep 30
+  mkdir $INSTALL_DIRbackup
+  mv $INSTALL_DIR$PRE_DAEMON $INSTALL_DIRbackup/
+  mv $INSTALL_DIR$PRE_CLI $INSTALL_DIRbackup/
+  mv $INSTALL_DIR$PRE_TX $INSTALL_DIRbackup/
 
-mkdir /usr/local/bin/backup
-mv /usr/local/bin/$PRE_DAEMON /usr/local/bin/backup/
-mv /usr/local/bin/$PRE_CLI /usr/local/bin/backup/
-mv /usr/local/bin/$PRE_TX /usr/local/bin/backup/
+### Post 3.0.0 Update ###
+  else $CLI stop
+  echo -e "${yellow}Backing up old daemon incase of script bomb${nc}"
+  sleep 30
 
-echo -e "${yellow}Updating $COINNAME daemon files${nc}"
+  mkdir $INSTALL_DIRbackup
+  mv $INSTALL_DIR$DAEMON $INSTALL_DIRbackup/
+  mv $INSTALL_DIR$CLI $INSTALL_DIRbackup/
+  mv $INSTALL_DIR$TX $INSTALL_DIRbackup/
+fi
+
+echo "${yellow}Downloading $(tr a-z A-Z <<< ${COINNAME:0:1})${COINNAME:1} binaries${nc}"
+
+  curl -O $BINARY_URL$COMP_FILE
+
+echo "${yellow}Updating $(tr a-z A-Z <<< ${COINNAME:0:1})${COINNAME:1} daemon files${nc}"
 sleep 3
 
-mv $DAEMON /usr/local/bin/
-mv $CLI /usr/local/bin/
-mv $TX /usr/local/bin/
+  tar xvzf -C $BINARY_FILE $INSTALL_DIR
 
-echo -e "${green}$COINNAME files updated${nc}"
+
+echo -e "${green}$(tr a-z A-Z <<< ${COINNAME:0:1})${COINNAME:1} files updated${nc}"
 sleep 3
 
 echo -e "${yellow}Charging laser weapons${nc}"
@@ -79,18 +102,18 @@ sleep 3
 echo -e "${yellow}Acquiring target${nc}"
 sleep 3
 
-echo -e "${yellow}Target Acquired... preparing to destroy backup files${nc}"
+echo -e "${yellow}Target Acquired... preparing to destroy backup and tmp files${nc}"
 sleep 3
 
 echo  -e "${yellow}Firing all lasers${nc}"
 sleep 3
 
-rm -rf /usr/local/bin/backup/ ../ohmc*.tar.gz
+rm -rf "$INSTALL_DIR"backup "$INSTALL_DIR"readme.txt $BINARY_FILE
 
 echo -e "${red}Target destroyed${nc}"
 sleep 3
 
-echo -e "${green}You may now start the $COINNAME daemon normally ie.${nc}"
+echo -e "${green}You may now start the $(tr a-z A-Z <<< ${COINNAME:0:1})${COINNAME:1} daemon normally ie.${nc}"
 sleep 3
 
 echo " "
@@ -99,5 +122,8 @@ echo " "
 sleep 3
 echo -e "${red}Please make sure to restart your $NODENAME in your controller wallet to complete the upgrade process${nc}"
 
-fi
-exit
+sleep 3
+echo " "
+echo -e "${red}P.S. I delete myself${nc}"
+echo " "
+rm $0
