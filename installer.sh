@@ -208,17 +208,23 @@ read DOSETUPSNAP
 if [[ $DOSETUPSNAP =~ "y" ]] ; then
   curl -O $SNAP_URL$SNAP_FILE
   tar xvzf -C $SNAP_FILE $CONF_DIR
+  ### clean up ###
+  rm $SNAP_FILE
 fi
 
+
+   echo -e "${yellow}Cleaning up{nc}"
+   rm $BINARY_FILE
+
    echo -e "${yellow}You may start your node with the following command${nc}"
+   sleep 1
    echo ""
    echo "$DAEMON -daemon"
 
-sleep 3
-
-echo " "
-echo -e "${red}P.S. I deleted myself${nc}"
-echo " "
+   sleep 1
+   echo " "
+   echo -e "${red}P.S. I deleted myself${nc}"
+   echo " "
 rm $0
 
 
