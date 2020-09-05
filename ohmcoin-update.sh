@@ -90,7 +90,7 @@ sleep 1
 PRE_VERSION_FOUND=0
 resp=$(fileExist "$INSTALL_DIR/$PRE_DAEMON")
 if [[ $resp == "Exists!" ]]; then
-  $PRE_VERSION_FOUND=1
+  PRE_VERSION_FOUND=1
   echo -e "${yellow}Pre $COINAME $VERSION is installed.${nc}"
   echo -e "${dark_green}Stopping $COINNAME daemon...${nc}"
   $PRE_CLI stop && sleep 10 || echo -e "${gray}> Daemon Already Stopped--${nc}"
