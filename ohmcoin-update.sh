@@ -62,30 +62,30 @@ fi
 
 ### Check for older version ###
 if ! [ -x "$(command -v $PRE_DAEMON)" ]; then
-  echo -e "Pre $COINAME $VERSION is installed."
+  echo -e "Pre $(tr a-z A-Z <<< ${COINNAME:0:1})${COINNAME:1} $VERSION is installed."
   $PRE_CLI stop
   echo -e "${yellow}Backing up old daemon incase of script bomb${nc}"
   sleep 30
 
-  mkdir $INSTALL_DIRbackup
-  mv $INSTALL_DIR$PRE_DAEMON $INSTALL_DIRbackup/
-  mv $INSTALL_DIR$PRE_CLI $INSTALL_DIRbackup/
-  mv $INSTALL_DIR$PRE_TX $INSTALL_DIRbackup/
+  mkdir "$INSTALL_DIR"backup
+  mv $INSTALL_DIR$PRE_DAEMON "$INSTALL_DIR"backup/
+  mv $INSTALL_DIR$PRE_CLI "$INSTALL_DIR"backup/
+  mv $INSTALL_DIR$PRE_TX "$INSTALL_DIR"backup/
 
 ### Post 3.0.0 Update ###
   else $CLI stop
   echo -e "${yellow}Backing up old daemon incase of script bomb${nc}"
   sleep 30
 
-  mkdir $INSTALL_DIRbackup
-  mv $INSTALL_DIR$DAEMON $INSTALL_DIRbackup/
-  mv $INSTALL_DIR$CLI $INSTALL_DIRbackup/
-  mv $INSTALL_DIR$TX $INSTALL_DIRbackup/
+  mkdir "$INSTALL_DIR"backup
+  mv $INSTALL_DIR$DAEMON "$INSTALL_DIR"backup/
+  mv $INSTALL_DIR$CLI "$INSTALL_DIR"backup/
+  mv $INSTALL_DIR$TX "$INSTALL_DIR"backup/
 fi
 
 echo "${yellow}Downloading $(tr a-z A-Z <<< ${COINNAME:0:1})${COINNAME:1} binaries${nc}"
 
-  curl -O $BINARY_URL$COMP_FILE
+  curl -O "$BINARY_UR"L$COMP_FILE
 
 echo "${yellow}Updating $(tr a-z A-Z <<< ${COINNAME:0:1})${COINNAME:1} daemon files${nc}"
 sleep 3
