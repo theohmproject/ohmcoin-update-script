@@ -32,7 +32,7 @@ PRE_TX=ohmcoin-tx
 
 ### Coin Specific Vars ###
 COINNAME=ohmcoin
-VERSION=3.0.0
+VERSION=3.0.2
 NODENAME=Karmanode
 
 ### Binary Files ###
